@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'tokens',
     'departments',
     'services',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

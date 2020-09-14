@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet 
+from .serializers import ServiceSerializer 
+from .models import Service
 
-# Create your views here.
+
+class ServiceViewSet(ModelViewSet):
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
