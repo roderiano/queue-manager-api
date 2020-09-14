@@ -11,6 +11,7 @@ class DepartmentViewSet(ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
 
+    # Method to list all availabe services at departmet
     @action(methods=['get'], detail=True,)
     def available_services(self, request, pk=None):
         department = self.get_object()
