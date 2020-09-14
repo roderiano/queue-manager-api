@@ -10,7 +10,7 @@ class Token(models.Model):
                     ('TAR', 'TOKEN ARCHIVED')]
 
     status = models.CharField(max_length=3, choices=STATUS_TYPES, default='TIS')
-    departament = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
     
     issue_date = models.DateTimeField(auto_now_add=True)
     attendence_date = models.DateTimeField(blank=True, null=True)

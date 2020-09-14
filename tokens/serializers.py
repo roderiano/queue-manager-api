@@ -1,7 +1,10 @@
 from .models import Token
+from departments.serializers import DepartmentSerializer
+from services.serializers import ServiceSerializer
 from rest_framework.serializers import ModelSerializer 
+
 
 class TokenSerializer(ModelSerializer):
     class Meta:
         model = Token
-        fields = ['id', 'status', 'departament', 'issue_date', 'attendence_date', 'archived_date', 'service', 'clerk']
+        fields = ['id', 'status', 'department', 'issue_date', 'attendence_date', 'archived_date', 'service', 'clerk']
