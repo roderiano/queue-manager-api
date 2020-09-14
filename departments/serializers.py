@@ -5,4 +5,4 @@ from rest_framework.serializers import ModelSerializer
 class DepartmentSerializer(ModelSerializer):
     class Meta:
         model = Department
-        fields = ['id', 'name', 'available_services']
+        fields = ['id', 'name',]
