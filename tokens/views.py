@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from departments.serializers import DepartmentSerializer
 from services.serializers import ServiceSerializer
+from users.serializers import UserSerializer
 from .serializers import TokenSerializer 
 from .models import Token
 from .exceptions import *
@@ -67,6 +68,14 @@ class TokenViewSet(ModelViewSet):
     def department(self, request, pk=None):
         token = self.get_object()
         response = DepartmentSerializer(token.department).data 
+
+        return Response(response) 
+
+
+    @action(methods=['get'], detail=True,)
+    def clerk(self, request, pk=None):
+        token = self.get_object()
+        response = UserSerializer(token.clerk).data 
 
         return Response(response) 
 
