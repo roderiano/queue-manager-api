@@ -8,8 +8,9 @@ from rest_framework.authtoken.models import Token
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email']
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'is_superuser']
         extra_kwargs = {'password': {'write_only': True}}
+
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -26,6 +27,7 @@ class UserSerializer(ModelSerializer):
         user.first_name = validated_data.get('first_name', instance.first_name)
         user.last_name = validated_data.get('last_name', instance.last_name)
         user.email = validated_data.get('email', instance.email)
+        user.is_superuser = validated_data.get('is_superuser', instance.is_superuser)
         user.set_password(password)
         user.save()
         return user
