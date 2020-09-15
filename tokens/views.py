@@ -1,10 +1,12 @@
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet 
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import MethodNotAllowed 
 from departments.serializers import DepartmentSerializer
 from services.serializers import ServiceSerializer
+from services.models import Service
 from users.serializers import UserSerializer
 from .serializers import TokenSerializer 
 from .models import Token
@@ -17,8 +19,32 @@ class TokenViewSet(ModelViewSet):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
 
+    authentication_classes = [TokenAuthentication,]
+    permission_classes = [IsAuthenticated,]
 
-    @action(methods=['get'], detail=True,)
+    def create(self, request):
+        serializer = TokenSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+    def update(self, request, pk=None):
+        return Response({'token': 'This method is not allowed.', 'available methods': {'/start_attendence', '/end_attendence'}})
+
+
+    def partial_update(self, request, pk=None):
+        return Response({'token': 'This method is not allowed.', 'available methods': {'/start_attendence', '/end_attendence'}})
+
+
+    def destroy(self, request, pk=None):
+        return Response({'token': 'This method is not allowed.', 'available methods': {'/end_attendence'}})
+    
+    
+    @action(methods=['put'], detail=True,)
     def start_attendence(self, request, pk=None):
         token = self.get_object()
         current_user = request.user
@@ -38,21 +64,31 @@ class TokenViewSet(ModelViewSet):
         return Response(response) 
 
 
-    @action(methods=['get'], detail=True,)
-    def archive_token(self, request, pk=None):
+    @action(methods=['put'], detail=True,)
+    def end_attendence(self, request, pk=None):
         token = self.get_object()
-        if token.status == 'IAT':
-            token.status = 'TAR'
-            token.archived_date = dt.datetime.now(tz=timezone.utc) 
-            token.time_in_attendence = token.archived_date - token.attendence_date
-            token.save()
-            response = TokenSerializer(token).data 
-        elif token.status == 'TIS':
-            raise AttendenceNotStartedException()
-        elif token.status == 'TAR':
-            raise TokenAlreadyArchivedException() 
-
-        return Response(response) 
+        
+        if 'service' in request.data:
+            
+            service = Service.objects.filter(pk=request.data['service'])
+            if service:
+                token = self.get_object()
+                if token.status == 'IAT':
+                    token.status = 'TAR'
+                    token.archived_date = dt.datetime.now(tz=timezone.utc) 
+                    token.time_in_attendence = token.archived_date - token.attendence_date
+                    token.service = service[0]
+                    token.save()
+                    response = TokenSerializer(token).data 
+                elif token.status == 'TIS':
+                    raise AttendenceNotStartedException()
+                elif token.status == 'TAR':
+                    raise TokenAlreadyArchivedException() 
+                return Response(response) 
+            else:
+                return Response({'status': 'Service doesn\'t exist.'}) 
+        else:
+            return Response({'status': 'This method requires \'service\' field.'}) 
 
 
     @action(methods=['get'], detail=True,)
@@ -77,7 +113,12 @@ class TokenViewSet(ModelViewSet):
     @action(methods=['get'], detail=True,)
     def clerk(self, request, pk=None):
         token = self.get_object()
-        response = UserSerializer(token.clerk).data 
+        
+        if token.status != 'TIS':
+            response = UserSerializer(token.clerk).data 
+        else:
+            raise AttendenceNotStartedException
 
         return Response(response) 
 
+        

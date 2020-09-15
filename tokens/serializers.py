@@ -5,6 +5,11 @@ from rest_framework.serializers import ModelSerializer
 
 
 class TokenSerializer(ModelSerializer):
+
     class Meta:
         model = Token
-        fields = ['id', 'status', 'issue_date', 'attendence_date', 'archived_date', 'time_in_attendence', 'time_waiting_attendence']
+        fields = ['id', 'department', 'status',]
+        extra_kwargs = {'status': {'read_only': True}}
+
+
+
