@@ -7,4 +7,4 @@ from rest_framework.serializers import ModelSerializer
 class TokenSerializer(ModelSerializer):
     class Meta:
         model = Token
-        fields = ['id', 'status', 'department', 'issue_date', 'attendence_date', 'archived_date', 'time_in_attendence', 'time_waiting_attendence', 'service', 'clerk']
+        fields = ['id', 'status', 'issue_date', 'attendence_date', 'archived_date', 'time_in_attendence', 'time_waiting_attendence', 'clerk']

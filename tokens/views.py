@@ -1,6 +1,8 @@
 from rest_framework.viewsets import ModelViewSet 
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from departments.serializers import DepartmentSerializer
+from services.serializers import ServiceSerializer
 from .serializers import TokenSerializer 
 from .models import Token
 from .exceptions import *
@@ -11,6 +13,7 @@ import datetime as dt
 class TokenViewSet(ModelViewSet):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
+
 
     @action(methods=['get'], detail=True,)
     def start_attendence(self, request, pk=None):
@@ -31,6 +34,7 @@ class TokenViewSet(ModelViewSet):
 
         return Response(response) 
 
+
     @action(methods=['get'], detail=True,)
     def archive_token(self, request, pk=None):
         token = self.get_object()
@@ -46,3 +50,23 @@ class TokenViewSet(ModelViewSet):
             raise TokenAlreadyArchivedException() 
 
         return Response(response) 
+
+
+    @action(methods=['get'], detail=True,)
+    def service(self, request, pk=None):
+        token = self.get_object()
+
+        if token.status == 'TAR':
+            response = ServiceSerializer(token.service).data 
+        else:
+            raise TokenNotArchivedException()
+
+        return Response(response) 
+
+    @action(methods=['get'], detail=True,)
+    def department(self, request, pk=None):
+        token = self.get_object()
+        response = DepartmentSerializer(token.department).data 
+
+        return Response(response) 
+

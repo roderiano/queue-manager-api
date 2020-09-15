@@ -19,11 +19,13 @@ from rest_framework import routers
 from departments.views import DepartmentViewSet
 from services.views import ServiceViewSet
 from tokens.views import TokenViewSet
+from users.views import UserViewSet
 
 router = routers.DefaultRouter()
 router.register(r'departments', DepartmentViewSet)
 router.register(r'services', ServiceViewSet)
 router.register(r'tokens', TokenViewSet)
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
