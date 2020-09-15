@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from services.models import Service 
 from services.serializers import ServiceSerializer
-from users.permissions import IsAdminOrReadOnly
+from api.permissions import IsAdminOrReadOnly
 from .serializers import DepartmentSerializer
 from .models import Department
 
