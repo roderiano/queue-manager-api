@@ -30,6 +30,7 @@ class UserSerializer(ModelSerializer):
         user.is_superuser = validated_data.get('is_superuser', instance.is_superuser)
         user.set_password(password)
         user.save()
+        
         return user
 
 
