@@ -13,6 +13,7 @@ from .models import Token
 from .exceptions import *
 from django.utils import timezone
 import datetime as dt
+from rest_framework import status
 
 
 class TokenViewSet(ModelViewSet):
@@ -69,7 +70,6 @@ class TokenViewSet(ModelViewSet):
         token = self.get_object()
         
         if 'service' in request.data:
-            
             service = Service.objects.filter(pk=request.data['service'])
             if service:
                 token = self.get_object()

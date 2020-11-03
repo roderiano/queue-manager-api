@@ -19,15 +19,16 @@ from rest_framework import routers
 from rest_framework.authtoken import views
 from departments.views import DepartmentViewSet
 from services.views import ServiceViewSet
-from tokens.views import TokenViewSet
 from users.views import UserViewSet
-
+from tokens.views import TokenViewSet
+from profiles.views import ProfileViewSet
 
 router = routers.DefaultRouter()
 router.register(r'departments', DepartmentViewSet)
 router.register(r'services', ServiceViewSet)
 router.register(r'tokens', TokenViewSet)
 router.register(r'users', UserViewSet)
+router.register(r'profiles', ProfileViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

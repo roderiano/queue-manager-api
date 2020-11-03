@@ -1,20 +1,29 @@
 from django.contrib.auth.models import User
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from profiles.serializers import ProfileSerializer
 
 class UserSerializer(ModelSerializer):
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'is_superuser']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'email', 'is_superuser',]
+        extra_kwargs = {'password': {'write_only': True},}
 
 
     def create(self, validated_data):
+        username = validated_data.pop('username')
         password = validated_data.pop('password')
-        user = User(**validated_data)
+        # first_name = validated_data.pop('first_name')
+        # last_name = validated_data.pop('last_name')
+        # email = validated_data.pop('email')
+        # is_superuser = validated_data.pop('is_superuser')
+
+        user = User.objects.create_user(username=username, password=password,)
         user.set_password(password)
         user.save()
         return user

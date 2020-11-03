@@ -25,8 +25,8 @@ class GetAllServicesTest(TestCase):
         serializer = ServiceSerializer(Service.objects.all(), many=True)
         response = self.client.get('/services/')
 
-        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
 
 
 class GetSingleServiceTest(TestCase):
@@ -39,12 +39,14 @@ class GetSingleServiceTest(TestCase):
         token = Token.objects.get(user__username='admin')
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
+
     def test_single_service_get(self):
         serializer = ServiceSerializer(self.service, many=False)
         response = self.client.get('/services/' + str(self.service.pk) + '/')
 
-        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+        
     
     def test_invalid_single_service_get(self):
         serializer = ServiceSerializer(self.service, many=False)
@@ -106,4 +108,3 @@ class PutSingleServiceTest(TestCase):
     def test_invalid_single_service_put(self):
         response = self.client.put('/services/0/', {'name': 'Service 2'})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-

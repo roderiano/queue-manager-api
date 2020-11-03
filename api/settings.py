@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'tokens',
     'departments',
     'services',
+    'profiles',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -79,6 +80,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'api.wsgi.application'
+
+REST_AUTH_SERIALIZERS = { 'USER_DETAILS_SERIALIZER':'profiles.serializers.ProfileSerializer' }
 
 
 # Database
