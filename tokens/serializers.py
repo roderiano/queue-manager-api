@@ -8,7 +8,7 @@ class TokenSerializer(ModelSerializer):
 
     class Meta:
         model = Token
-        fields = ['id', 'key', 'department', 'status', 'issue_date', 'attendence_date', 'archived_date', 'time_waiting_attendence', 'time_in_attendence', 'service', 'clerk',]
+        fields = ['id', 'key', 'department', 'status', 'issue_date', 'attendence_date', 'archived_date', 'time_waiting_attendence', 'time_in_attendence', 'service', 'clerk', 'token_type',]
         extra_kwargs = {'status': {'read_only': True}, 
                         'key': {'read_only': True}, 
                         'issue_date': {'read_only': True}, 

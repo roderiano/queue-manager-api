@@ -31,7 +31,12 @@ class TokenViewSet(ModelViewSet):
             department = Department.objects.get(pk=request.data['department']) 
             daily_tokens = Token.objects.filter(issue_date__year=dt.datetime.now().strftime("%Y"), issue_date__month=dt.datetime.now().strftime("%m"))
             
-            key = department.code + '{:>03}'.format(len(daily_tokens)) if len(department.code) == 2 else department.code + '{:>04}'.format(len(daily_tokens))
+            if 'token_type' in request.data:
+                key = request.data['token_type'] + department.code
+            else:
+                key = 'N' + department.code 
+
+            key = key + '{:>03}'.format(len(daily_tokens)) if len(department.code) == 2 else department.code + '{:>04}'.format(len(daily_tokens))
             token_serializer.save(key=key)
             token_serializer.save()
             
