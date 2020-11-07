@@ -35,7 +35,6 @@ class TokenViewSet(ModelViewSet):
             token_serializer.save(key=key)
             token_serializer.save()
             
-            token_serializer.save()
             return Response(token_serializer.data)
         else:
             return Response(token_serializer.errors,

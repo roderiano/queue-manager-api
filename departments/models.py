@@ -3,7 +3,7 @@ from services.models import Service
 
 class Department(models.Model):
     name = models.CharField(max_length=100,)
-    code = models.CharField(max_length=2, unique=True,)
+    code = models.CharField(max_length=2,)
     available_services = models.ManyToManyField(Service)
 
     def __str__(self):
