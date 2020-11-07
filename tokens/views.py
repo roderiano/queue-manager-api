@@ -40,7 +40,7 @@ class TokenViewSet(ModelViewSet):
             token_serializer.save(key=key)
             token_serializer.save()
             
-            return Response(token_serializer.data)
+            return Response(token_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(token_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
