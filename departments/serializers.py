@@ -6,5 +6,5 @@ class DepartmentSerializer(ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ['id', 'name', 'available_services',]
+        fields = ['id', 'name', 'code', 'available_services',]
         extra_kwargs = {'available_services': {'write_only': True}}

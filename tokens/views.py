@@ -14,6 +14,7 @@ from .exceptions import *
 from django.utils import timezone
 import datetime as dt
 from rest_framework import status
+from departments.models import Department
 
 
 class TokenViewSet(ModelViewSet):
@@ -23,13 +24,21 @@ class TokenViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication,]
     permission_classes = [IsAuthenticated,]
 
+
     def create(self, request):
-        serializer = TokenSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+        token_serializer = TokenSerializer(data=request.data)
+        if token_serializer.is_valid():
+            department = Department.objects.get(pk=request.data['department']) 
+            daily_tokens = Token.objects.filter(issue_date__year=dt.datetime.now().strftime("%Y"), issue_date__month=dt.datetime.now().strftime("%m"))
+            
+            key = department.code + '{:>03}'.format(len(daily_tokens)) if len(department.code) == 2 else department.code + '{:>04}'.format(len(daily_tokens))
+            token_serializer.save(key=key)
+            token_serializer.save()
+            
+            token_serializer.save()
+            return Response(token_serializer.data)
         else:
-            return Response(serializer.errors,
+            return Response(token_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -39,7 +39,7 @@ class UserViewSet(ModelViewSet):
 
             return Response(user_serializer.data)
         else:
-            return Response(user_serializer.errors if profile_serializer.is_valid() else profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(profile_serializer.errors if user_serializer.is_valid() else user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
     def create(self, request):
@@ -55,7 +55,7 @@ class UserViewSet(ModelViewSet):
 
             return Response(user_serializer.data)
         else:
-            return Response(user_serializer.errors if profile_serializer.is_valid() else profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(profile_serializer.errors if user_serializer.is_valid() else user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
     @action(methods=['get'], detail=False,)

@@ -6,6 +6,7 @@ from services.serializers import ServiceSerializer
 from api.permissions import IsAdminOrReadOnly
 from .serializers import DepartmentSerializer
 from .models import Department
+from rest_framework import status
 
 
 class DepartmentViewSet(ModelViewSet):
@@ -22,3 +23,13 @@ class DepartmentViewSet(ModelViewSet):
         serializer = ServiceSerializer(department.available_services.all(), many=True)
 
         return Response(serializer.data) 
+
+    def create(self, request):
+        serializer = DepartmentSerializer(data=request.data)
+        if serializer.is_valid():
+            code = str(request.data['code']).upper()
+            serializer.save(code=code)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
