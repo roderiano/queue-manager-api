@@ -7,6 +7,8 @@ from api.permissions import IsAdminOrReadOnly
 from .serializers import DepartmentSerializer
 from .models import Department
 from rest_framework import status
+from tokens.models import Token
+import datetime as dt
 
 
 class DepartmentViewSet(ModelViewSet):
@@ -59,8 +61,28 @@ class DepartmentViewSet(ModelViewSet):
             else:        
                 return Response({'code': 'Code must be unique.',}, status=status.HTTP_400_BAD_REQUEST)    
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
     def partial_update(self, request, pk=None):
         return Response({ "detail":  "This action is not authorized." }, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['get'], detail=True,)
+    def info(self, request, pk=None):
+        department = self.get_object()
+        serializer = DepartmentSerializer(department)
+        
+        daily_tokens = Token.objects.filter(issue_date__year=dt.datetime.now().strftime("%Y"), issue_date__month=dt.datetime.now().strftime("%m"))
+        
+        count_token_issued = 0
+        count_token_archived = 0
+        count_token_in_attendence = 0
+
+        for token in daily_tokens:
+            if token.status == 'TIS': count_token_issued += 1
+            elif token.status == 'TAR': count_token_archived += 1
+            elif token.status == 'IAT': count_token_in_attendence += 1
+
+        return Response({'instance': serializer.data, 'tokens': {'issued': count_token_issued, 'in_attendence': count_token_in_attendence, 'archived': count_token_archived}}) 
+

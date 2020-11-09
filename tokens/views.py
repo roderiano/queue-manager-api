@@ -35,7 +35,7 @@ class TokenViewSet(ModelViewSet):
                 key = request.data['token_type'] + department.code
             else:
                 key = 'N' + department.code 
-
+                
             key = key + '{:>03}'.format(len(daily_tokens)) if len(department.code) == 2 else department.code + '{:>04}'.format(len(daily_tokens))
             token_serializer.save(key=key)
             token_serializer.save()
