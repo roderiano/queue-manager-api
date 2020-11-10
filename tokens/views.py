@@ -29,7 +29,7 @@ class TokenViewSet(ModelViewSet):
         token_serializer = TokenSerializer(data=request.data)
         if token_serializer.is_valid():
             department = Department.objects.get(pk=request.data['department']) 
-            daily_tokens = Token.objects.filter(issue_date__year=dt.datetime.now().strftime("%Y"), issue_date__month=dt.datetime.now().strftime("%m"))
+            daily_tokens = Token.objects.filter(issue_date__year=dt.datetime.now().strftime('%Y'), issue_date__month=dt.datetime.now().strftime('%m'), issue_date__day=dt.datetime.now().strftime('%d'))
             
             if 'token_type' in request.data:
                 key = request.data['token_type'] + department.code
