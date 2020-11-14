@@ -1,5 +1,5 @@
 from django.db import models
-from profiles.models import Profile
+from django.contrib.auth.models import User
 from departments.models import Department
 from services.models import Service
 
@@ -21,7 +21,7 @@ class Token(models.Model):
     time_waiting_attendence = models.DurationField(blank=True, null=True,)
     time_in_attendence = models.DurationField(blank=True, null=True,)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True,)
-    clerk = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True,)
+    clerk = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True,)
     token_type = models.CharField(max_length=1, choices=TOKEN_TYPES, default='N',)
 
     def __str__(self):
