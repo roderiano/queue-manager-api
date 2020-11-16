@@ -1,5 +1,6 @@
 from rest_framework.authentication import TokenAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet 
 from rest_framework.decorators import action
@@ -21,9 +22,12 @@ from departments.models import Department
 class TokenViewSet(ModelViewSet):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id', 'key', 'status', 'department', 'issue_date', 'attendence_date', 'archived_date',
+    filter_backends = [DjangoFilterBackend, OrderingFilter,]
+    
+    fields = ['id', 'key', 'status', 'department', 'issue_date', 'attendence_date', 'archived_date',
                         'time_waiting_attendence', 'time_in_attendence', 'service', 'clerk', 'token_type',]
+    ordering_fields = fields
+    filterset_fields = fields
 
     authentication_classes = [TokenAuthentication,]
     permission_classes = [IsAuthenticated,]
@@ -51,15 +55,15 @@ class TokenViewSet(ModelViewSet):
 
 
     def update(self, request, pk=None):
-        return Response({'token': 'This method is not allowed.', 'available methods': {'/start_attendence', '/end_attendence'}})
+        return Response({'token': 'This method is not allowed.', 'available methods': {'/start_attendence', '/end_attendence'}}, status=status.HTTP_400_BAD_REQUEST)
 
 
     def partial_update(self, request, pk=None):
-        return Response({'token': 'This method is not allowed.', 'available methods': {'/start_attendence', '/end_attendence'}})
+        return Response({'token': 'This method is not allowed.', 'available methods': {'/start_attendence', '/end_attendence'}}, status=status.HTTP_400_BAD_REQUEST)
 
 
     def destroy(self, request, pk=None):
-        return Response({'token': 'This method is not allowed.', 'available methods': {'/end_attendence'}})
+        return Response({'token': 'This method is not allowed.', 'available methods': {'/end_attendence'}}, status=status.HTTP_400_BAD_REQUEST)
     
     
     @action(methods=['put'], detail=True,)
@@ -103,9 +107,9 @@ class TokenViewSet(ModelViewSet):
                     raise TokenAlreadyArchivedException() 
                 return Response(response) 
             else:
-                return Response({'status': 'Service doesn\'t exist.'}) 
+                return Response({'status': 'Service doesn\'t exist.'}, status=status.HTTP_400_BAD_REQUEST) 
         else:
-            return Response({'status': 'This method requires \'service\' field.'}) 
+            return Response({'status': 'This method requires \'service\' field.'}, status=status.HTTP_400_BAD_REQUEST) 
 
 
     @action(methods=['get'], detail=True,)
