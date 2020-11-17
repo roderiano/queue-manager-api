@@ -68,16 +68,23 @@ class TokenViewSet(ModelViewSet):
     
     @action(methods=['put'], detail=True,)
     def start_attendence(self, request, pk=None):
+        user = request.user
         token = self.get_object()
-        current_user = request.user
+        response = TokenSerializer(token).data
+
+        tokens = Token.objects.filter(clerk=user, status='IAT')
+        token_data = TokenSerializer(tokens[0]).data
+        
+        if len(tokens) > 0:
+            return Response({'status': 'Clerk with another token in attendence.', 'token_in_attendence': token_data}, status=status.HTTP_303_SEE_OTHER)
+
 
         if token.status == 'TIS':
             token.status = 'IAT'
             token.attendence_date = dt.datetime.now(tz=timezone.utc) 
             token.time_waiting_attendence = token.attendence_date - token.issue_date
-            token.clerk = current_user
+            token.clerk = user
             token.save()
-            response = TokenSerializer(token).data 
         elif token.status == 'IAT':
             raise AttendenceAlreadyStartedException()
         elif token.status == 'TAR':
@@ -107,7 +114,7 @@ class TokenViewSet(ModelViewSet):
                     raise TokenAlreadyArchivedException() 
                 return Response(response) 
             else:
-                return Response({'status': 'Service doesn\'t exist.'}, status=status.HTTP_400_BAD_REQUEST) 
+                return Response({'service': 'Service doesn\'t exist.'}, status=status.HTTP_400_BAD_REQUEST) 
         else:
             return Response({'status': 'This method requires \'service\' field.'}, status=status.HTTP_400_BAD_REQUEST) 
 
