@@ -1,6 +1,5 @@
 from rest_framework.authentication import TokenAuthentication
-from django_filters.rest_framework import DjangoFilterBackend, BaseInFilter, NumberFilter
-from django_filters import Filter, FilterSet
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet 
@@ -19,23 +18,11 @@ import datetime as dt
 from rest_framework import status
 from departments.models import Department
 
-class TokenInFilter(BaseInFilter,):
-    pass
-
-
-class TokenFilter(FilterSet):
-    status__in = TokenInFilter(field_name='status', lookup_expr='in')
-
-    class Meta:
-        model = Token
-        fields = ['status__in',]
-
 
 class TokenViewSet(ModelViewSet):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter,]
-    filter_class = TokenFilter
     
     fields = ['id', 'key', 'status', 'department', 'issue_date', 'attendence_date', 'archived_date',
                         'time_waiting_attendence', 'time_in_attendence', 'service', 'clerk', 'token_type',]
@@ -86,10 +73,11 @@ class TokenViewSet(ModelViewSet):
         response = TokenSerializer(token).data
 
         tokens = Token.objects.filter(clerk=user, status='IAT')
+        token_data = TokenSerializer(tokens[0]).data
         
         if len(tokens) > 0:
-            token_data = TokenSerializer(tokens[0]).data
             return Response({'status': 'Clerk with another token in attendence.', 'token_in_attendence': token_data}, status=status.HTTP_303_SEE_OTHER)
+
 
         if token.status == 'TIS':
             token.status = 'IAT'
