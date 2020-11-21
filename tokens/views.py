@@ -73,11 +73,10 @@ class TokenViewSet(ModelViewSet):
         response = TokenSerializer(token).data
 
         tokens = Token.objects.filter(clerk=user, status='IAT')
-        token_data = TokenSerializer(tokens[0]).data
         
         if len(tokens) > 0:
+            token_data = TokenSerializer(tokens[0]).data
             return Response({'status': 'Clerk with another token in attendence.', 'token_in_attendence': token_data}, status=status.HTTP_303_SEE_OTHER)
-
 
         if token.status == 'TIS':
             token.status = 'IAT'
