@@ -78,7 +78,6 @@ class TokenViewSet(ModelViewSet):
             token_data = TokenSerializer(tokens[0]).data
             return Response({'status': 'Clerk with another token in attendence.', 'token_in_attendence': token_data}, status=status.HTTP_303_SEE_OTHER)
 
-
         if token.status == 'TIS':
             token.status = 'IAT'
             token.attendence_date = dt.datetime.now(tz=timezone.utc) 
