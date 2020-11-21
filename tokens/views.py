@@ -33,6 +33,16 @@ class TokenViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated,]
 
 
+    def get_queryset(self):
+        print(self.request.query_params)
+        if 'start_date' in self.request.query_params and 'end_date' in self.request.query_params:
+            tokens = Token.objects.filter(issue_date__range=[self.request.query_params['start_date'], self.request.query_params['end_date']])
+        else:
+            tokens = Token.objects.all()
+
+        return tokens
+
+
     def create(self, request):
         token_serializer = TokenSerializer(data=request.data)
         if token_serializer.is_valid():
