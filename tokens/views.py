@@ -34,7 +34,6 @@ class TokenViewSet(ModelViewSet):
 
 
     def get_queryset(self):
-        print(self.request.query_params)
         if 'start_date' in self.request.query_params and 'end_date' in self.request.query_params:
             tokens = Token.objects.filter(issue_date__range=[self.request.query_params['start_date'], self.request.query_params['end_date']])
         else:
@@ -156,6 +155,49 @@ class TokenViewSet(ModelViewSet):
         else:
             raise AttendenceNotStartedException
 
-        return Response(response) 
+        return Response(response)
+    
+
+    @action(methods=['get'], detail=False,)
+    def dashboard_data(self, request):
+        if 'start_date' in self.request.query_params and 'end_date' in self.request.query_params:
+            tokens = Token.objects.filter(issue_date__range=[self.request.query_params['start_date'], self.request.query_params['end_date']])
+            departments = Department.objects.all()
+            services = Service.objects.all()
+        else:
+            return Response({'start_date': 'Missing field start_date.'}, status=status.HTTP_400_BAD_REQUEST) if 'start_date' not in self.request.query_params else Response({'end_date': 'Missing field end_date.'}, status=status.HTTP_400_BAD_REQUEST) 
+
+        # Get tokens amount
+        departments_name = []
+        for department in departments:
+            if department.name not in departments_name:
+                departments_name.append(department.name)
+
+        total_tokens = [0] * len(departments_name)
+        for token in tokens:
+            total_tokens[departments_name.index(token.department.name)] += 1
+        
+        print(departments_name)
+        print(total_tokens)
+
+        # Get service amount
+        services_name = []
+        for service in services:
+            if service.name not in services_name:
+                services_name.append(service.name)
+        services_name.append('Unfinished Attendance')
+
+        total_services = [0] * len(services_name)
+        for token in tokens:
+            if token.status == 'TAR':
+                total_services[services_name.index(token.service.name)] += 1
+            else:
+                total_services[services_name.index('Unfinished Attendance')] += 1    
+
+
+        return Response({'tokens_amount': {'labels': departments_name, 'data': total_tokens},
+                         'services_amount': {'labels': services_name, 'data': total_services},
+                        })
+
 
         
