@@ -17,6 +17,7 @@ from django.utils import timezone
 import datetime as dt
 from rest_framework import status
 from departments.models import Department
+from django.contrib.auth.models import User
 
 
 class TokenViewSet(ModelViewSet):
@@ -164,21 +165,20 @@ class TokenViewSet(ModelViewSet):
             tokens = Token.objects.filter(issue_date__range=[self.request.query_params['start_date'], self.request.query_params['end_date']])
             departments = Department.objects.all()
             services = Service.objects.all()
+            clerks = User.objects.all()
         else:
             return Response({'start_date': 'Missing field start_date.'}, status=status.HTTP_400_BAD_REQUEST) if 'start_date' not in self.request.query_params else Response({'end_date': 'Missing field end_date.'}, status=status.HTTP_400_BAD_REQUEST) 
 
-        # Get tokens amount
+        # Get tokens amount per department
         departments_name = []
         for department in departments:
             if department.name not in departments_name:
                 departments_name.append(department.name)
 
-        total_tokens = [0] * len(departments_name)
+        total_tokens_per_department = [0] * len(departments_name)
         for token in tokens:
-            total_tokens[departments_name.index(token.department.name)] += 1
+            total_tokens_per_department[departments_name.index(token.department.name)] += 1
         
-        print(departments_name)
-        print(total_tokens)
 
         # Get service amount
         services_name = []
@@ -195,8 +195,31 @@ class TokenViewSet(ModelViewSet):
                 total_services[services_name.index('Unfinished Attendance')] += 1    
 
 
-        return Response({'tokens_amount': {'labels': departments_name, 'data': total_tokens},
+        # Get tokens amount per clerk
+        clerks_name = []
+        for clerk in clerks:
+                clerks_name.append(clerk.username)
+
+        total_tokens_per_clerk = [0] * len(clerks_name)
+        for token in tokens:
+            if token.status != 'TIS':
+                total_tokens_per_clerk[clerks_name.index(token.clerk.username)] += 1
+
+        
+        # Total time per clerk
+        total_time_per_clerk = [0] * len(clerks_name)
+        for token in tokens:
+            if token.status == 'TAR':
+                total_time_per_clerk[clerks_name.index(token.clerk.username)] += (token.time_in_attendence.seconds // 60) % 60
+
+
+        for i in range(0, len(total_time_per_clerk)):
+            total_time_per_clerk[i] = str(total_time_per_clerk[i])
+
+        return Response({'tokens_amount_per_department': {'labels': departments_name, 'data': total_tokens_per_department},
                          'services_amount': {'labels': services_name, 'data': total_services},
+                         'tokens_amount_per_clerk': {'labels': clerks_name, 'data': total_tokens_per_clerk},
+                         'total_time_per_clerk': {'labels': clerks_name, 'data': total_time_per_clerk},
                         })
 
 
