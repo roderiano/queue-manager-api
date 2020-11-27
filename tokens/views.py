@@ -210,16 +210,30 @@ class TokenViewSet(ModelViewSet):
         total_time_per_clerk = [0] * len(clerks_name)
         for token in tokens:
             if token.status == 'TAR':
-                total_time_per_clerk[clerks_name.index(token.clerk.username)] += (token.time_in_attendence.seconds // 60) % 60
+                total_time_per_clerk[clerks_name.index(token.clerk.username)] += token.time_in_attendence.seconds
 
+        
+        # General info
+        total_tokens = len(tokens)
+        average_in_attendance = dt.timedelta()
+        average_waiting = dt.timedelta()
 
-        for i in range(0, len(total_time_per_clerk)):
-            total_time_per_clerk[i] = str(total_time_per_clerk[i])
+        for token in tokens:
+            if token.status == 'TAR':
+                average_in_attendance += token.time_in_attendence
+        average_in_attendance = str(average_in_attendance / len(tokens)) if len(tokens) > 0 else "0:00:0.000000"
+
+        for token in tokens:
+            if token.status == 'TAR':
+                average_waiting += token.time_waiting_attendence
+        average_waiting = str(average_waiting / len(tokens)) if len(tokens) > 0 else "0:00:0.000000"
+
 
         return Response({'tokens_amount_per_department': {'labels': departments_name, 'data': total_tokens_per_department},
                          'services_amount': {'labels': services_name, 'data': total_services},
                          'tokens_amount_per_clerk': {'labels': clerks_name, 'data': total_tokens_per_clerk},
                          'total_time_per_clerk': {'labels': clerks_name, 'data': total_time_per_clerk},
+                         'general_info': {'total_tokens': total_tokens, 'average_in_attendace': average_in_attendance, 'average_waiting': average_waiting},
                         })
 
 
