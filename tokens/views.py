@@ -157,7 +157,15 @@ class TokenViewSet(ModelViewSet):
             raise AttendenceNotStartedException
 
         return Response(response)
-    
+
+    @action(methods=['get'], detail=False,)
+    def monitor(self, request):
+        tokens = Token.objects.all().order_by('-issue_date')
+        tokens = tokens[:5] if len(tokens) >= 5 else tokens[:len(tokens)]
+        
+        serializer = TokenSerializer(tokens, many=True)
+
+        return Response(serializer.data)
 
     @action(methods=['get'], detail=False,)
     def dashboard_data(self, request):
