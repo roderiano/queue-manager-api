@@ -17,6 +17,7 @@ from django.utils import timezone
 import datetime as dt
 from rest_framework import status
 from departments.models import Department
+from profiles.models import Profile
 from django.contrib.auth.models import User
 
 
@@ -160,12 +161,23 @@ class TokenViewSet(ModelViewSet):
 
     @action(methods=['get'], detail=False,)
     def monitor(self, request):
-        tokens = Token.objects.all().order_by('-issue_date')
+        tokens = Token.objects.filter(attendence_date__year=dt.datetime.now().strftime('%Y'), 
+                                      attendence_date__month=dt.datetime.now().strftime('%m'), 
+                                      attendence_date__day=dt.datetime.now().strftime('%d'),
+                                      status__in=['IAT', 'TAR']).order_by('-attendence_date')
         tokens = tokens[:5] if len(tokens) >= 5 else tokens[:len(tokens)]
+
+        token_detail = []
+        for token in tokens:
+            place = Profile.objects.get(user=token.clerk).place
+            token_detail.append({ 
+                                    'key': token.key, 
+                                    'place': place,
+                                })
         
         serializer = TokenSerializer(tokens, many=True)
 
-        return Response(serializer.data)
+        return Response(token_detail)
 
     @action(methods=['get'], detail=False,)
     def dashboard_data(self, request):
