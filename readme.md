@@ -1,4 +1,10 @@
-# Setting up queue-manager-api Environment
+# queue-manager-api
+The queue-manager-api is a backend application for managing service queues developed with djando rest framework.
+You can access the frontend repository [here](https://github.com/roderiano/queue-manager-app). 
+
+**[DEMO VIDEO HERE](https://www.youtube.com/watch?v=KjSHIxrr3zQ&ab_channel=GabrielSilveira)**
+
+# Setting up Environment
 This is a guide for setting up the QueueManager development environment. This guide assumes that you already have Python3 installed on your machine.
 
 ## Creating a virtual environment
@@ -37,6 +43,13 @@ python3 manage.py migrate
 
 This command will apply pending migrations.
 
+## Create admin user
+To create an admin user to access the system, run the command:
+
+```flask
+python3 manage.py createsuperuser
+```
+
 ## Running the application
 To run the application, run the following command:
 
@@ -45,3 +58,4 @@ python3 manage.py runserver
 ```
 
 This command will start the application on port 8000.
+

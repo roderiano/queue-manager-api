@@ -13,7 +13,7 @@ from users.serializers import UserSerializer
 from .serializers import TokenSerializer 
 from .models import Token
 from .exceptions import *
-from django.utils import timezone
+import pytz
 import datetime as dt
 from rest_framework import status
 from departments.models import Department
@@ -91,7 +91,7 @@ class TokenViewSet(ModelViewSet):
 
         if token.status == 'TIS':
             token.status = 'IAT'
-            token.attendence_date = dt.datetime.now(tz=timezone.utc) 
+            token.attendence_date = dt.datetime.now(tz=pytz.utc) 
             token.time_waiting_attendence = token.attendence_date - token.issue_date
             token.clerk = user
             token.save()
@@ -113,7 +113,7 @@ class TokenViewSet(ModelViewSet):
                 token = self.get_object()
                 if token.status == 'IAT':
                     token.status = 'TAR'
-                    token.archived_date = dt.datetime.now(tz=timezone.utc) 
+                    token.archived_date = dt.datetime.now(tz=pytz.utc) 
                     token.time_in_attendence = token.archived_date - token.attendence_date
                     token.service = service[0]
                     token.save()
